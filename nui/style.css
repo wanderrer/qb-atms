@@ -19,7 +19,7 @@ body {
 #cardsDisplay::-webkit-scrollbar-track
 {
     background-color: none;
-    border: none
+    border: none;
 }
 
 #cardsDisplay::-webkit-scrollbar
@@ -75,7 +75,7 @@ body {
 }
 
 #v-pills-tabContent::-webkit-scrollbar-thumb, #v-pills-tabContent-atm::-webkit-scrollbar-thumb {
-    background-color:transparent
+    background-color:transparent;
     border:none;
 }
 
@@ -83,5 +83,5 @@ body {
     width: 10px;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
-    background-color:transparent
+    background-color:transparent;
 }
