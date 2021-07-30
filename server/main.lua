@@ -68,12 +68,11 @@ RegisterCommand('atm', function(source, args, rawCommand)
                     info.cardActive = false
                 end
             else
-                exports.ghmattimysql:execute('SELECT charinfo FROM players WHERE citizenid=@citizenid', {['@citizenid'] = info.citizenid}, function(player)
-                    local xCH = json.decode(player[1].charinfo)
-                    if xCH.card ~= cardNum then
-                        info.cardActive = false
-                    end
-                end)
+                local player = exports.ghmattimysql:executeSync('SELECT charinfo FROM players WHERE citizenid=@citizenid', {['@citizenid'] = info.citizenid})
+                local xCH = json.decode(player[1].charinfo)
+                if xCH.card ~= cardNum then
+                    info.cardActive = false
+                end
             end
             table.insert(cards, v.info)
         end
@@ -87,12 +86,11 @@ RegisterCommand('atm', function(source, args, rawCommand)
                     info.cardActive = false
                 end
             else
-                exports.ghmattimysql:execute('SELECT charinfo FROM players WHERE citizenid=@citizenid', {['@citizenid'] = info.citizenid}, function(player)
-                    xCH = json.decode(player[1].charinfo)
-                    if xCH.card ~= cardNum then
-                        info.cardActive = false
-                    end
-                end)
+                local player = exports.ghmattimysql:executeSync('SELECT charinfo FROM players WHERE citizenid=@citizenid', {['@citizenid'] = info.citizenid})
+                xCH = json.decode(player[1].charinfo)
+                if xCH.card ~= cardNum then
+                    info.cardActive = false
+                end
             end
             table.insert(cards, v.info)
         end
@@ -142,25 +140,24 @@ AddEventHandler('qb-atms:server:doAccountWithdraw', function(data)
                 banking['accountinfo'] = xCH.PlayerData.charinfo.account
                 banking['cash'] = xPlayer.Functions.GetMoney('cash')
             else
-                exports.ghmattimysql:execute('SELECT * FROM players WHERE citizenid=@citizenid', {['@citizenid'] = cardHolder}, function(player)
-                    local xCH = json.decode(player[1])
-                    local bankCount = tonumber(xCH.money.bank) - tonumber(data.amount)
-                    if bankCount > 0  then
-                        xPlayer.Functions.AddMoney('cash', tonumber(data.amount))
-                        xCH.money.bank = bankCount
-                        exports.ghmattimysql:execute('UPDATE players SET money=@money WHERE citizenid=@citizenid', {['@money'] = xCH.money, ['@citizenid'] = cardHolder})
-                        dailyWithdraws[cardHolder] = dailyWithdraws[cardHolder] + tonumber(data.amount)
-                        TriggerClientEvent('QBCore:Notify', src, "Withdraw $" .. data.amount .. ' from credit card. Daily Withdraws: ' .. dailyWithdraws[cardHolder], "success")
-                    else
-                        TriggerClientEvent('QBCore:Notify', src, "You cant go into minus in ATM.", "error")
-                    end
+                local player = exports.ghmattimysql:executeSync('SELECT * FROM players WHERE citizenid=@citizenid', {['@citizenid'] = cardHolder})
+                local xCH = json.decode(player[1])
+                local bankCount = tonumber(xCH.money.bank) - tonumber(data.amount)
+                if bankCount > 0  then
+                    xPlayer.Functions.AddMoney('cash', tonumber(data.amount))
+                    xCH.money.bank = bankCount
+                    exports.ghmattimysql:execute('UPDATE players SET money=@money WHERE citizenid=@citizenid', {['@money'] = xCH.money, ['@citizenid'] = cardHolder})
+                    dailyWithdraws[cardHolder] = dailyWithdraws[cardHolder] + tonumber(data.amount)
+                    TriggerClientEvent('QBCore:Notify', src, "Withdraw $" .. data.amount .. ' from credit card. Daily Withdraws: ' .. dailyWithdraws[cardHolder], "success")
+                else
+                    TriggerClientEvent('QBCore:Notify', src, "You cant go into minus in ATM.", "error")
+                end
 
-                    banking['online'] = false
-                    banking['name'] = xCH.charinfo.firstname .. ' ' .. xCH.charinfo.lastname
-                    banking['bankbalance'] = xCH.money.bank
-                    banking['accountinfo'] = xCH.charinfo.account
-                    banking['cash'] = xPlayer.Functions.GetMoney('cash')
-                end)
+                banking['online'] = false
+                banking['name'] = xCH.charinfo.firstname .. ' ' .. xCH.charinfo.lastname
+                banking['bankbalance'] = xCH.money.bank
+                banking['accountinfo'] = xCH.charinfo.account
+                banking['cash'] = xPlayer.Functions.GetMoney('cash')
             end
             TriggerClientEvent('qb-atms:client:updateBankInformation', src, banking)
         else
@@ -184,14 +181,13 @@ QBCore.Functions.CreateCallback('qb-atms:server:loadBankAccount', function(sourc
         banking['accountinfo'] = xCH.PlayerData.charinfo.account
         banking['cash'] = xPlayer.Functions.GetMoney('cash')
     else
-        exports.ghmattimysql:execute('SELECT * FROM players WHERE citizenid=@citizenid', {['@citizenid'] = cardHolder}, function(player)
-            local xCH = json.decode(player[1])
-            banking['online'] = false
-            banking['name'] = xCH.charinfo.firstname .. ' ' .. xCH.charinfo.lastname
-            banking['bankbalance'] = xCH.money.bank
-            banking['accountinfo'] = xCH.charinfo.account
-            banking['cash'] = xPlayer.Functions.GetMoney('cash')
-        end)
+        local player = exports.ghmattimysql:executeSync('SELECT * FROM players WHERE citizenid=@citizenid', {['@citizenid'] = cardHolder})
+        local xCH = json.decode(player[1])
+        banking['online'] = false
+        banking['name'] = xCH.charinfo.firstname .. ' ' .. xCH.charinfo.lastname
+        banking['bankbalance'] = xCH.money.bank
+        banking['accountinfo'] = xCH.charinfo.account
+        banking['cash'] = xPlayer.Functions.GetMoney('cash')
     end
     cb(banking)
 end)
