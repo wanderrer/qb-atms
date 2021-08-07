@@ -21,6 +21,7 @@ RegisterNUICallback("NUIFocusOff", function(data, cb)
     SendNUIMessage({
         status = "closeATM"
     })
+    PlayATMAnimation('exit')   
 end)
 
 RegisterNUICallback("playATMAnim", function(data, cb)
@@ -49,6 +50,31 @@ AddEventHandler('qb-atms:client:updateBankInformation', function(banking)
         information = banking
     })
 end)
+
+function PlayATMAnimation(animation)
+    local playerPed = PlayerPedId()
+    if animation == 'enter' then
+        RequestAnimDict('amb@prop_human_atm@male@enter')
+        while not HasAnimDictLoaded('amb@prop_human_atm@male@enter') do
+            Citizen.Wait(1)
+        end
+    
+        if HasAnimDictLoaded('amb@prop_human_atm@male@enter') then 
+            TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@enter', "enter", 1.0,-1.0, 3000, 1, 1, true, true, true)
+        end
+    end
+
+    if animation == 'exit' then
+        RequestAnimDict('amb@prop_human_atm@male@exit')
+        while not HasAnimDictLoaded('amb@prop_human_atm@male@exit') do
+            Citizen.Wait(1)
+        end
+    
+        if HasAnimDictLoaded('amb@prop_human_atm@male@exit') then 
+            TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@exit', "exit", 1.0,-1.0, 3000, 1, 1, true, true, true)
+        end
+    end
+end
 
 function tprint (t, s)
     for k, v in pairs(t) do
@@ -113,6 +139,7 @@ AddEventHandler('qb-atms:client:loadATM', function(cards)
             if atm then 
                 local obj = GetClosestObjectOfType(playerCoords.x, playerCoords.y, playerCoords.z, 2.0, hash, false, false, false)
                 local atmCoords = GetEntityCoords(obj, false)
+                    PlayATMAnimation('enter')
                 QBCore.Functions.Progressbar("accessing_atm", "Accessing ATM", 1500, false, true, {
                     disableMovement = false,
                     disableCarMovement = false,
