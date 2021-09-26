@@ -1,56 +1,19 @@
 local dailyWithdraws = {}
+local QBCore = exports['qb-core']:GetCoreObject()
 
-QBCore.Functions.CreateCallback('qb-debitcard:server:requestCards', function(source, cb)
-    local src = source
-    local xPlayer = QBCore.Functions.GetPlayer(src)
-    local visas = self.Functions.GetItemsByName('visa')
-    local masters = self.Functions.GetItemsByName('mastercard')
-    local cards = {}
+-- Thread
 
-    if visas ~= nil and masters ~= nil then
-        for _, v in visas do
-            table.insert(cards, v.info)
-        end
-        for _, v in masters do
-            table.insert(cards, v.info)
-        end
-    end
-    return cards
-end)
-
-QBCore.Functions.CreateCallback('qb-debitcard:server:deleteCard', function(source, cb, data)
-    local cn = data.cardNumber
-    local ct = data.cardType
-    local src = source
-    local xPlayer = QBCore.Functions.GetPlayer(src)
-    local found = xPlayer.Functions.GetCardSlot(cn, ct)
-    if found ~= nil then
-        xPlayer.Functions.RemoveItem(ct, 1, found)
-        cb(true)
-    else
-        cb(false)
+Citizen.CreateThread(function()
+    while true do
+        Wait(3600000)
+        dailyWithdraws = {}
+        TriggerClientEvent('QBCore:Notify', -1, "Daily Withdraw Limit Reset", "success")
     end
 end)
 
-function tprint (t, s)
-    for k, v in pairs(t) do
-        local kfmt = '["' .. tostring(k) ..'"]'
-        if type(k) ~= 'string' then
-            kfmt = '[' .. k .. ']'
-        end
-        local vfmt = '"'.. tostring(v) ..'"'
-        if type(v) == 'table' then
-            tprint(v, (s or '')..kfmt)
-        else
-            if type(v) ~= 'string' then
-                vfmt = tostring(v)
-            end
-            print(type(t)..(s or '')..kfmt..' = '..vfmt)
-        end
-    end
-end 
+-- Command
 
-RegisterCommand('atm', function(source, args, rawCommand)
+RegisterCommand('atm', function(source)
     local src = source
     local xPlayer = QBCore.Functions.GetPlayer(src)
     local visas = xPlayer.Functions.GetItemsByName('visa')
@@ -74,7 +37,7 @@ RegisterCommand('atm', function(source, args, rawCommand)
                     info.cardActive = false
                 end
             end
-            table.insert(cards, v.info)
+            cards[#cards+1] = v.info
         end
         for _, v in pairs(masters) do
             local info = v.info
@@ -92,28 +55,22 @@ RegisterCommand('atm', function(source, args, rawCommand)
                     info.cardActive = false
                 end
             end
-            table.insert(cards, v.info)
+            cards[#cards+1] = v.info
         end
     end
     TriggerClientEvent('qb-atms:client:loadATM', src, cards)
 end)
 
-Citizen.CreateThread(function()
-    while true do
-        Wait(3600000)
-        dailyWithdraws = {}
-        TriggerClientEvent('QBCore:Notify', -1, "Daily Withdraw Limit Reset", "success")
-    end
-end)
+-- Event
 
 RegisterServerEvent('qb-atms:server:doAccountWithdraw')
 AddEventHandler('qb-atms:server:doAccountWithdraw', function(data)
-    if data ~= nil then 
+    if data ~= nil then
         local src = source
         local xPlayer = QBCore.Functions.GetPlayer(src)
         local cardHolder = data.cid
-
         local xCH = QBCore.Functions.GetPlayerByCitizenId(cardHolder)
+
         if not dailyWithdraws[cardHolder] then
             dailyWithdraws[cardHolder] = 0
         end
@@ -131,7 +88,7 @@ AddEventHandler('qb-atms:server:doAccountWithdraw', function(data)
                     dailyWithdraws[cardHolder] = dailyWithdraws[cardHolder] + tonumber(data.amount)
                     TriggerClientEvent('QBCore:Notify', src, "Withdraw $" .. data.amount .. ' from credit card. Daily Withdraws: ' .. dailyWithdraws[cardHolder], "success")
                 else
-                    TriggerClientEvent('QBCore:Notify', src, "You cant go into minus in ATM.", "error")
+                    TriggerClientEvent('QBCore:Notify', src, "Not Enough Money", "error")
                 end
 
                 banking['online'] = true
@@ -150,7 +107,7 @@ AddEventHandler('qb-atms:server:doAccountWithdraw', function(data)
                     dailyWithdraws[cardHolder] = dailyWithdraws[cardHolder] + tonumber(data.amount)
                     TriggerClientEvent('QBCore:Notify', src, "Withdraw $" .. data.amount .. ' from credit card. Daily Withdraws: ' .. dailyWithdraws[cardHolder], "success")
                 else
-                    TriggerClientEvent('QBCore:Notify', src, "You cant go into minus in ATM.", "error")
+                    TriggerClientEvent('QBCore:Notify', src, "Not Enough Money", "error")
                 end
 
                 banking['online'] = false
@@ -161,17 +118,49 @@ AddEventHandler('qb-atms:server:doAccountWithdraw', function(data)
             end
             TriggerClientEvent('qb-atms:client:updateBankInformation', src, banking)
         else
-            TriggerClientEvent('QBCore:Notify', src, "You have reached the daily limit.", "error")
+            TriggerClientEvent('QBCore:Notify', src, "You have reached the daily limit", "error")
         end
     end
 end)
 
+-- Callbacks
+
+QBCore.Functions.CreateCallback('qb-debitcard:server:requestCards', function(source, cb)
+    local src = source
+    local xPlayer = QBCore.Functions.GetPlayer(src)
+    local visas = self.Functions.GetItemsByName('visa')
+    local masters = self.Functions.GetItemsByName('mastercard')
+    local cards = {}
+
+    if visas ~= nil and masters ~= nil then
+        for _, v in visas do
+            cards[#cards+1] = v.info
+        end
+        for _, v in masters do
+            cards[#cards+1] = v.info
+        end
+    end
+    return cards
+end)
+
+QBCore.Functions.CreateCallback('qb-debitcard:server:deleteCard', function(source, cb, data)
+    local cn = data.cardNumber
+    local ct = data.cardType
+    local src = source
+    local xPlayer = QBCore.Functions.GetPlayer(src)
+    local found = xPlayer.Functions.GetCardSlot(cn, ct)
+    if found ~= nil then
+        xPlayer.Functions.RemoveItem(ct, 1, found)
+        cb(true)
+    else
+        cb(false)
+    end
+end)
 
 QBCore.Functions.CreateCallback('qb-atms:server:loadBankAccount', function(source, cb, cid, cardnumber)
     local src = source
     local xPlayer = QBCore.Functions.GetPlayer(src)
     local cardHolder = cid
-
     local xCH = QBCore.Functions.GetPlayerByCitizenId(cardHolder)
     local banking = {}
     if xCH ~= nil then

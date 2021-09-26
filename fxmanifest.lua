@@ -4,17 +4,9 @@ game 'gta5'
 description 'QB-ATM'
 version '1.0.0'
 
-shared_scripts {
-    '@qb-core/import.lua',
-    'config/main.lua'
-}
-
+shared_script 'config.lua'
 server_script 'server/main.lua'
-
-client_scripts {
-    'client/main.lua',
-    'client/nui.lua'
-}
+client_script 'client/main.lua'
 
 ui_page 'nui/index.html'
 
@@ -30,3 +22,5 @@ files {
     'nui/index.html',
     'nui/qb-atms.js'
 }
+
+lua54 'yes'
