@@ -31,7 +31,7 @@ RegisterCommand('atm', function(source)
                     info.cardActive = false
                 end
             else
-                local player = exports.oxmysql:fetchSync('SELECT charinfo FROM players WHERE citizenid = ?', { info.citizenid })
+                local player = exports.oxmysql:executeSync('SELECT charinfo FROM players WHERE citizenid = ?', { info.citizenid })
                 local xCH = json.decode(player[1].charinfo)
                 if xCH.card ~= cardNum then
                     info.cardActive = false
@@ -49,7 +49,7 @@ RegisterCommand('atm', function(source)
                     info.cardActive = false
                 end
             else
-                local player = exports.oxmysql:fetchSync('SELECT charinfo FROM players WHERE citizenid = ?', { info.citizenid })
+                local player = exports.oxmysql:executeSync('SELECT charinfo FROM players WHERE citizenid = ?', { info.citizenid })
                 xCH = json.decode(player[1].charinfo)
                 if xCH.card ~= cardNum then
                     info.cardActive = false
@@ -97,7 +97,7 @@ AddEventHandler('qb-atms:server:doAccountWithdraw', function(data)
                 banking['accountinfo'] = xCH.PlayerData.charinfo.account
                 banking['cash'] = xPlayer.Functions.GetMoney('cash')
             else
-                local player = exports.oxmysql:fetchSync('SELECT * FROM players WHERE citizenid = ?', { cardHolder })
+                local player = exports.oxmysql:executeSync('SELECT * FROM players WHERE citizenid = ?', { cardHolder })
                 local xCH = json.decode(player[1])
                 local bankCount = tonumber(xCH.money.bank) - tonumber(data.amount)
                 if bankCount > 0  then
@@ -170,7 +170,7 @@ QBCore.Functions.CreateCallback('qb-atms:server:loadBankAccount', function(sourc
         banking['accountinfo'] = xCH.PlayerData.charinfo.account
         banking['cash'] = xPlayer.Functions.GetMoney('cash')
     else
-        local player = exports.oxmysql:fetchSync('SELECT * FROM players WHERE citizenid = ?', { cardHolder })
+        local player = exports.oxmysql:executeSync('SELECT * FROM players WHERE citizenid = ?', { cardHolder })
         local xCH = json.decode(player[1])
         banking['online'] = false
         banking['name'] = xCH.charinfo.firstname .. ' ' .. xCH.charinfo.lastname
