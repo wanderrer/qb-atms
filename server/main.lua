@@ -3,7 +3,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 -- Thread
 
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
         Wait(3600000)
         dailyWithdraws = {}
@@ -128,8 +128,8 @@ end)
 QBCore.Functions.CreateCallback('qb-debitcard:server:requestCards', function(source, cb)
     local src = source
     local xPlayer = QBCore.Functions.GetPlayer(src)
-    local visas = self.Functions.GetItemsByName('visa')
-    local masters = self.Functions.GetItemsByName('mastercard')
+    local visas = xPlayer.Functions.GetItemsByName('visa')
+    local masters = xPlayer.Functions.GetItemsByName('mastercard')
     local cards = {}
 
     if visas ~= nil and masters ~= nil then
