@@ -7,9 +7,9 @@ local function PlayATMAnimation(animation)
     if animation == 'enter' then
         RequestAnimDict('amb@prop_human_atm@male@enter')
         while not HasAnimDictLoaded('amb@prop_human_atm@male@enter') do
-            Citizen.Wait(1)
+            Wait(1)
         end
-        if HasAnimDictLoaded('amb@prop_human_atm@male@enter') then 
+        if HasAnimDictLoaded('amb@prop_human_atm@male@enter') then
             TaskPlayAnim(playerPed, 'amb@prop_human_atm@male@enter', "enter", 1.0,-1.0, 3000, 1, 1, true, true, true)
         end
     end
@@ -17,9 +17,9 @@ local function PlayATMAnimation(animation)
     if animation == 'exit' then
         RequestAnimDict('amb@prop_human_atm@male@exit')
         while not HasAnimDictLoaded('amb@prop_human_atm@male@exit') do
-            Citizen.Wait(1)
+            Wait(1)
         end
-        if HasAnimDictLoaded('amb@prop_human_atm@male@exit') then 
+        if HasAnimDictLoaded('amb@prop_human_atm@male@exit') then
             TaskPlayAnim(playerPed, 'amb@prop_human_atm@male@exit', "exit", 1.0,-1.0, 3000, 1, 1, true, true, true)
         end
     end
@@ -48,7 +48,7 @@ RegisterNetEvent('qb-atms:client:loadATM', function(cards)
         for k, v in pairs(Config.ATMModels) do
             local hash = GetHashKey(v)
             local atm = IsObjectNearPoint(hash, playerCoords.x, playerCoords.y, playerCoords.z, 1.5)
-            if atm then 
+            if atm then
                 local obj = GetClosestObjectOfType(playerCoords.x, playerCoords.y, playerCoords.z, 2.0, hash, false, false, false)
                 local atmCoords = GetEntityCoords(obj, false)
                     PlayATMAnimation('enter')
@@ -87,10 +87,10 @@ RegisterNUICallback("playATMAnim", function(data, cb)
     local anim = 'amb@prop_human_atm@male@idle_a'
     RequestAnimDict(anim)
     while not HasAnimDictLoaded(anim) do
-        Citizen.Wait(1)
+        Wait(1)
     end
 
-    if HasAnimDictLoaded(anim) then 
+    if HasAnimDictLoaded(anim) then
         TaskPlayAnim(PlayerPedId(), anim, "idle_a", 1.0,-1.0, 3000, 1, 1, true, true, true)
     end
 end)
