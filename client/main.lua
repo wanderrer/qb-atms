@@ -124,7 +124,7 @@ RegisterNUICallback("removeCard", function(data, cb)
             SendNUIMessage({
                 status = "closeATM"
             })
-            QBCore.Functions.Notify('Card has deleted.', 'success')
+            QBCore.Functions.Notify('Card has been deleted.', 'success')
         else
             QBCore.Functions.Notify('Failed to delete card.', 'error')
         end
