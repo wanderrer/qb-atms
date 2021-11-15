@@ -63,8 +63,7 @@ end)
 
 -- Event
 
-RegisterServerEvent('qb-atms:server:doAccountWithdraw')
-AddEventHandler('qb-atms:server:doAccountWithdraw', function(data)
+RegisterNetEvent('qb-atms:server:doAccountWithdraw', function(data)
     if data ~= nil then
         local src = source
         local xPlayer = QBCore.Functions.GetPlayer(src)
