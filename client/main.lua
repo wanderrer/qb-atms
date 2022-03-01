@@ -40,6 +40,21 @@ RegisterNetEvent('qb-atms:client:updateBankInformation', function(banking)
         information = banking
     })
 end)
+-- qb-target
+if Config.UseTarget then
+exports['qb-target']:AddTargetModel(Config.ATMModels, {
+	options = {
+		{
+			event = 'qb-atms:server:enteratm',
+            type = 'server',
+			icon = "fas fa-credit-card",
+			label = "Use ATM",
+		},
+	},
+	distance = 1.5,
+})
+end
+--
 
 RegisterNetEvent('qb-atms:client:loadATM', function(cards)
     if cards ~= nil and cards[1] ~= nil then
