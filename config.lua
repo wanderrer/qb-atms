@@ -1,7 +1,7 @@
 Config = {}
 
 Config.DailyLimit = 5000
-
+Config.UseTarget = false 
 Config.ATMModels = {
     "prop_atm_01",
     "prop_atm_02",
