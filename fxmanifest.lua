@@ -4,8 +4,10 @@ game 'gta5'
 description 'QB-ATMS'
 version '1.2.4'
 
-shared_script 'config.lua'
-
+shared_scripts {
+    '@qb-core/shared/locale.lua',
+    'config.lua'
+}
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua'
